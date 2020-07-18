@@ -22,7 +22,7 @@ const {
 
 const parseBase10 = x => parseInt(x, 10)
 const parseInput = pipe(
-  match(/[0-9]+d(4|6|8|10|12|20|100)(\s*\+\s*[0-9]+){0,1}/),
+  match(/[0-9]+d(100|20|12|10|8|6|4)(\s*\+\s*[0-9]+){0,1}/),
   when(pipe(length, equals(0)), () => {
     throw new Error(`Incorrect input!`)
   }),
