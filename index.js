@@ -23,11 +23,15 @@ const {
 const parseBase10 = x => parseInt(x, 10)
 const parseInput = pipe(
   match(/[0-9]+d(100|20|12|10|8|6|4)(\s*\+\s*[0-9]+){0,1}/),
+  // No matches found:
   when(pipe(length, equals(0)), () => {
     throw new Error(`Incorrect input!`)
   }),
+  // No bonus was found:
   when(pipe(nth(2), is(String), not), update(2, '0')),
+  // Remove the + from the bonus:
   adjust(2, replace(/\s*\+\s*/g, '')),
+  // Convert to integers:
   map(parseBase10)
 )
 
@@ -51,11 +55,15 @@ const countNat1And20 = xs => {
 const results = async function (sides = 6, count = 1) {
   return await fetch(`https://www.random.org/integers/?num=${count}&min=1&max=${sides}&col=1&base=10&format=plain&rnd=new`)
     .then(res => res.text())
-    .then(trim)
-    .then(split('\n'))
-    .then(map(parseBase10))
-    .then(when(pipe(always(sides), equals(20)), tap(countNat1And20)))
-    .then(sum)
+    .then(
+      pipe(
+        trim,
+        split('\n'),
+        map(parseBase10),
+        when(pipe(always(sides), equals(20)), tap(countNat1And20)),
+        sum
+      )
+    )
 };
 
 (async function () {
