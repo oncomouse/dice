@@ -59,7 +59,11 @@ const results = async function (sides = 6, count = 1) {
 };
 
 (async function () {
-  const [count, sides, bonus] = parseInput(process.argv.slice(2).join(' '))
-  const roll = await results(sides, count)
-  console.log(`${roll + bonus}`)
+  try {
+    const [count, sides, bonus] = parseInput(process.argv.slice(2).join(' '))
+    const roll = await results(sides, count)
+    console.log(`${roll + bonus}`)
+  } catch (error) {
+    console.error(error)
+  }
 })()
