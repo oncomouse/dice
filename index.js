@@ -32,9 +32,7 @@ const parseBase10 = x => parseInt(x, 10)
 const parseInput = pipe(
   match(/[0-9]+d(100|20|12|10|8|6|4)(\s*\+\s*[0-9]+){0,1}/),
   // No matches found:
-  when(pipe(length, equals(0)), () => {
-    throw new Error(`Incorrect input!`)
-  }),
+  when(pipe(length, equals(0)), always(['1', '20', '0'])),
   // No bonus was found:
   when(pipe(nth(2), is(String), not), update(2, '0')),
   // Remove the + from the bonus:
@@ -75,7 +73,7 @@ const advantageOrDisadvantage = async function (advantage) {
   const dice = await callRandomOrg(20, 2)
   return advantage ? max(...dice) : min(...dice)
 }
-const results = async function (sides = 6, count = 1) {
+const results = async function (sides = 20, count = 1) {
   return pipe(
     when(pipe(always(sides), equals(20)), tap(countNat1And20)),
     sum
