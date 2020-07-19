@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "isomorphic-fetch": "^2.2.1",
+    "minimist": "^1.2.5",
     "ramda": "^0.27.0"
   }
 }

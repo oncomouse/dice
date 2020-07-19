@@ -8,6 +8,8 @@ const {
   length,
   map,
   match,
+  max,
+  min,
   not,
   nth,
   pipe,
@@ -19,6 +21,12 @@ const {
   when,
   update,
 } = require('ramda')
+const argv = require('minimist')(process.argv.slice(2), {
+  boolean: [
+    'advantage',
+    'disadvantage',
+  ]
+})
 
 const parseBase10 = x => parseInt(x, 10)
 const parseInput = pipe(
@@ -52,23 +60,38 @@ const countNat1And20 = xs => {
     console.log(`Natural 20${nat20Count === 1 ? '' : 's'}: ${nat20Count}`)
   }
 }
-const results = async function (sides = 6, count = 1) {
+const callRandomOrg = async function (sides, count) {
   return await fetch(`https://www.random.org/integers/?num=${count}&min=1&max=${sides}&col=1&base=10&format=plain&rnd=new`)
     .then(res => res.text())
     .then(
       pipe(
         trim,
         split('\n'),
-        map(parseBase10),
-        when(pipe(always(sides), equals(20)), tap(countNat1And20)),
-        sum
+        map(parseBase10)
       )
     )
+}
+const advantageOrDisadvantage = async function (advantage) {
+  const dice = await callRandomOrg(20, 2)
+  console.log(dice)
+  return advantage ? max(...dice) : min(...dice)
+}
+const results = async function (sides = 6, count = 1) {
+  return pipe(
+    when(pipe(always(sides), equals(20)), tap(countNat1And20)),
+    sum
+  )(await callRandomOrg(sides, count))
 };
 
 (async function () {
   try {
-    const [count, sides, bonus] = parseInput(process.argv.slice(2).join(' '))
+    if (argv.advantage || argv.disadvantage) {
+      const bonus = parseInput(argv._.join(' '))[2]
+      const roll = await advantageOrDisadvantage(argv.advantage)
+      console.log(`${roll + bonus}`)
+      process.exit()
+    }
+    const [count, sides, bonus] = parseInput(argv._.join(' '))
     const roll = await results(sides, count)
     console.log(`${roll + bonus}`)
   } catch (error) {
