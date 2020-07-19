@@ -73,7 +73,6 @@ const callRandomOrg = async function (sides, count) {
 }
 const advantageOrDisadvantage = async function (advantage) {
   const dice = await callRandomOrg(20, 2)
-  console.log(dice)
   return advantage ? max(...dice) : min(...dice)
 }
 const results = async function (sides = 6, count = 1) {
@@ -86,9 +85,9 @@ const results = async function (sides = 6, count = 1) {
 (async function () {
   try {
     if (argv.advantage || argv.disadvantage) {
-      const bonus = parseInput(argv._.join(' '))[2]
+      const bonus = parseBase10(process.argv.slice(2).join(' ').replace(/\s+--(dis){0,1}advantage/, '').replace(/\s/g, ''))
       const roll = await advantageOrDisadvantage(argv.advantage)
-      console.log(`${roll + bonus}`)
+      console.log(`${roll + (isNaN(bonus) ? 0 : bonus)}`)
       process.exit()
     }
     const [count, sides, bonus] = parseInput(argv._.join(' '))
